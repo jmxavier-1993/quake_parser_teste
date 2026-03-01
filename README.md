@@ -1,52 +1,70 @@
-# Quake Parser
+# Quake Log Parser API 🎮
 
-## Task 1
+Este projeto foi desenvolvido para analisar arquivos de log do jogo **Quake 3 Arena**, processando dados não estruturados para extrair estatísticas detalhadas de partidas. A solução disponibiliza essas informações através de uma **API REST** construída com Flask.
 
-Construa um parser para o arquivo de log games.log.
+Como graduada em **Análise e Desenvolvimento de Sistemas** e com experiência sólida em análise de dados e planejamento operacional, desenvolvi esta ferramenta focando em eficiência de processamento, modularidade e clareza na entrega da informação.
 
-O arquivo `games.log` é gerado pelo servidor de quake 3 arena. Ele registra todas as informações dos jogos, quando um jogo começa, quando termina, quem matou quem, quem morreu pq caiu no vazio, quem morreu machucado, entre outros.
+### 🎯 Objetivo do Projeto
 
-O parser deve ser capaz de ler o arquivo, agrupar os dados de cada jogo, e em cada jogo deve coletar as informações de morte.
+O sistema identifica cada partida no log e consolida:
+* **Total de mortes** por partida.
+* **Lista de jogadores** (únicos por partida).
+* **Ranking de mortes** por jogador (com ordenação decrescente).
+* **Relatório de Meios de Morte** (causas como `MOD_ROCKET`, `MOD_FALLING`, etc.).
+* **Ranking Global Consolidado** (soma da performance acumulada de todos os jogos).
 
-### Exemplo
+### 🛠️ Como a Solução Funciona
 
-  	21:42 Kill: 1022 2 22: <world> killed Isgalamido by MOD_TRIGGER_HURT
-  
-  O player "Isgalamido" morreu pois estava ferido e caiu de uma altura que o matou.
+A arquitetura foi dividida em camadas seguindo boas práticas de desenvolvimento backend:
 
-  	2:22 Kill: 3 2 10: Isgalamido killed Dono da Bola by MOD_RAILGUN
-  
-  O player "Isgalamido" matou o player Dono da Bola usando a arma Railgun.
-  
-Para cada jogo o parser deve gerar algo como:
+1. **Ingestão de Dados (Parser):** O arquivo `games.log` é lido de forma iterativa, otimizando o uso de memória.
+2. **Lógica de Negócio (Models):** Implementação das regras de pontuação:
+   - Atribuição de pontos para o assassino.
+   - **Regra do `<world>`:** Quando o ambiente causa a morte, a vítima perde 1 ponto.
+   - Extração de nomes de jogadores via **Regex** (Expressões Regulares).
+3. **Persistência:** O script `main.py` atua como um processo de ETL, gerando um arquivo `output.json` estruturado na pasta `data/`.
+4. **Camada de Entrega (API):** O Flask serve os dados processados para consumo externo via endpoints HTTP.
 
-    game_1: {
-	    total_kills: 45;
-	    players: ["Dono da bola", "Isgalamido", "Zeh"]
-	    kills: {
-	      "Dono da bola": 5,
-	      "Isgalamido": 18,
-	      "Zeh": 20
-	    }
-	  }
+### 📁 Estrutura do Projeto
 
-### Observações
+quake_parser/
+├── src/
+│   ├── models.py      # Definição da classe Game e lógica de pontuação
+│   ├── parser.py      # Motor de processamento do log e Regex
+│   └── __init__.py    # Identificador de pacote Python
+├── data/
+│   ├── games.log      # Arquivo de log original (entrada)
+│   └── output.json    # Dados processados (saída)
+├── main.py            # Script principal para processamento (ETL)
+├── app.py             # Servidor da API Flask
+└── README.md
 
-1. Quando o `<world>` mata o player ele perde -1 kill.
-2. `<world>` não é um player e não deve aparecer na lista de players e nem no dicionário de kills.
-3. `total_kills` são os kills dos games, isso inclui mortes do `<world>`.
 
-## Task 2
+### 🚀 Setup e Execução
 
-Após construir o parser construa um script que imprima um relatório de cada jogo (simplemente imprimindo o hash) e um ranking geral de kills por jogador.
+**1. Instalar dependências:**
 
-## Task 3
 
-Construir uma API com qualquer Linguagem que busque o resultado do Game por ID.
+pip install flask
 
-# Requisitos
+**2. Processar o log (Gerar JSON):**
 
-1. O exercício poderá ser feito em qualquer linguagem, mas você deverá utilizar os conceitos de POO.
-2. Use git e tente fazer commits pequenos e bem descritos.
-3. Faça pelo menos um README explicando como fazer o setup, uma explicação da solução proposta
-4. Siga o que considera boas práticas de programação, coisas que um bom desenvolvedor olhe no seu código e não ache "feio" ou "ruim".
+python main.py
+
+**3. Iniciar a API:**
+
+python app.py
+
+### 🔗 Rotas Disponíveis
+
+
+GET / : Interface inicial com formulário de busca e menu de navegação.
+
+GET /games : Retorna o resumo completo de todas as partidas processadas.
+
+GET /buscar?game_id=<id> : Busca detalhes de uma partida específica por ID.
+
+GET /ranking : Retorna o Resumo Global, com o ranking de jogadores ordenado por pontuação acumulada.
+
+**Desenvolvido por Juliana Xavier
+Analista de Sistemas com expertise em Python, SQL e Engenharia de Dados.**
