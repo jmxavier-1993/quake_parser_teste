@@ -1,70 +1,72 @@
-# Quake Log Parser API 🎮
+🎮 Quake Log Parser - Dashboard Neon
+Este projeto é um ecossistema completo para análise de logs do jogo Quake 3 Arena. Ele consiste em um Parser em Python que processa arquivos de log brutos, uma API Flask para servir esses dados e um Frontend moderno em React para visualização.
 
-Este projeto foi desenvolvido para analisar arquivos de log do jogo **Quake 3 Arena**, processando dados não estruturados para extrair estatísticas detalhadas de partidas. A solução disponibiliza essas informações através de uma **API REST** construída com Flask.
+🚀 Tecnologias Utilizadas
+Backend
+Python: Lógica principal de processamento de strings e regex para os logs.
 
-Como graduada em **Análise e Desenvolvimento de Sistemas** e com experiência sólida em análise de dados e planejamento operacional, desenvolvi esta ferramenta focando em eficiência de processamento, modularidade e clareza na entrega da informação.
+Flask: API REST para fornecer os dados processados ao frontend.
 
-### 🎯 Objetivo do Projeto
+Flask-CORS: Gerenciamento de permissões para comunicação entre domínios.
 
-O sistema identifica cada partida no log e consolida:
-* **Total de mortes** por partida.
-* **Lista de jogadores** (únicos por partida).
-* **Ranking de mortes** por jogador (com ordenação decrescente).
-* **Relatório de Meios de Morte** (causas como `MOD_ROCKET`, `MOD_FALLING`, etc.).
-* **Ranking Global Consolidado** (soma da performance acumulada de todos os jogos).
+Frontend
+React + Vite: Estrutura de SPA rápida e otimizada.
 
-### 🛠️ Como a Solução Funciona
+Tailwind CSS: Estilização neon e responsiva.
 
-A arquitetura foi dividida em camadas seguindo boas práticas de desenvolvimento backend:
+TanStack Query (React Query): Gerenciamento de estado e cache das requisições de API.
 
-1. **Ingestão de Dados (Parser):** O arquivo `games.log` é lido de forma iterativa, otimizando o uso de memória.
-2. **Lógica de Negócio (Models):** Implementação das regras de pontuação:
-   - Atribuição de pontos para o assassino.
-   - **Regra do `<world>`:** Quando o ambiente causa a morte, a vítima perde 1 ponto.
-   - Extração de nomes de jogadores via **Regex** (Expressões Regulares).
-3. **Persistência:** O script `main.py` atua como um processo de ETL, gerando um arquivo `output.json` estruturado na pasta `data/`.
-4. **Camada de Entrega (API):** O Flask serve os dados processados para consumo externo via endpoints HTTP.
+Lucide React: Biblioteca de ícones vetoriais.
 
-### 📁 Estrutura do Projeto
+🛠️ Como Executar o Projeto
+1. Preparando o Backend (Python)
+Certifique-se de estar na pasta raiz do projeto.
 
-quake_parser/
-├── src/
-│   ├── models.py      # Definição da classe Game e lógica de pontuação
-│   ├── parser.py      # Motor de processamento do log e Regex
-│   └── __init__.py    # Identificador de pacote Python
-├── data/
-│   ├── games.log      # Arquivo de log original (entrada)
-│   └── output.json    # Dados processados (saída)
-├── main.py            # Script principal para processamento (ETL)
-├── app.py             # Servidor da API Flask
-└── README.md
+Bash
+# Instale as dependências
+pip install flask flask-cors
 
-
-### 🚀 Setup e Execução
-
-**1. Instalar dependências:**
-
-
-pip install flask
-
-**2. Processar o log (Gerar JSON):**
-
+# Execute o parser para gerar o output.json (se necessário)
 python main.py
 
-**3. Iniciar a API:**
-
+# Inicie a API Flask
 python app.py
+O servidor Flask iniciará em http://127.0.0.1:5000.
 
-### 🔗 Rotas Disponíveis
+2. Preparando o Frontend (React)
+Navegue até a pasta frontend_quake_parser.
 
+Bash
+# Instale as dependências do Node
+npm install
 
-GET / : Interface inicial com formulário de busca e menu de navegação.
+# Inicie o servidor de desenvolvimento
+npm run dev
+O Dashboard estará disponível em http://localhost:5173.
 
-GET /games : Retorna o resumo completo de todas as partidas processadas.
+📊 Endpoints da API
+GET /api/games: Retorna a lista completa de partidas processadas.
 
-GET /buscar?game_id=<id> : Busca detalhes de uma partida específica por ID.
+GET /api/ranking: Retorna o ranking global consolidado de todos os jogadores.
 
-GET /ranking : Retorna o Resumo Global, com o ranking de jogadores ordenado por pontuação acumulada.
+📁 Estrutura de Pastas (Frontend)
+A estrutura foi otimizada para ser independente de plataformas externas:
 
-**Desenvolvido por Juliana Xavier
-Analista de Sistemas com expertise em Python, SQL e Engenharia de Dados.**
+src/components/pages: Contém o Dashboard principal (Home.jsx).
+
+src/components/ui: Componentes de interface baseados em Shadcn (Tabs, Cards, etc.).
+
+src/components/lib: Lógica de configuração do query-client e utilitários.
+
+src/components/utils: Função centralizada cn para manipulação de classes CSS.
+
+👩‍💻 Desenvolvido por
+Juliana Xavier (Ju)
+
+Especialista em Análise e Desenvolvimento de Sistemas.
+
+Mais de 5 anos de experiência em análise de dados e planejamento operacional.
+
+## 📺 Demonstração do Dashboard
+
+![Demonstração do Quake Parser](assets/quaker_parser.gif)
