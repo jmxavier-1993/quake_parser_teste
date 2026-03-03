@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quake Parser Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; color: white; }
+        .card-gradient { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); }
+    </style>
+</head>
+<body class="p-8">
+    <div class="max-w-6xl mx-auto">
+        <header class="mb-10 text-center">
+            <h1 class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-purple-500">
+                Quake Parser Dashboard
+            </h1>
+            <p class="text-slate-400 mt-2">Análise de logs do Quake 3 Arena</p>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <div class="card-gradient p-6 rounded-2xl border border-slate-700 shadow-xl">
+                <p class="text-slate-400 text-sm uppercase">Total de Partidas</p>
+                <h2 class="text-3xl font-bold text-pink-500" id="total-games">-</h2>
+            </div>
+            <div class="card-gradient p-6 rounded-2xl border border-slate-700 shadow-xl">
+                <p class="text-slate-400 text-sm uppercase">Total de Kills</p>
+                <h2 class="text-3xl font-bold text-purple-500" id="total-kills">-</h2>
+            </div>
+            <div class="card-gradient p-6 rounded-2xl border border-slate-700 shadow-xl">
+                <p class="text-slate-400 text-sm uppercase">Jogadores Únicos</p>
+                <h2 class="text-3xl font-bold text-blue-500" id="total-players">-</h2>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <section class="card-gradient p-6 rounded-2xl border border-slate-700">
+                <h3 class="text-xl font-semibold mb-4 border-b border-slate-700 pb-2 italic text-pink-400">🏆 Ranking Global</h3>
+                <div id="ranking-list" class="space-y-4">
+                    </div>
+            </section>
+
+            <section class="card-gradient p-6 rounded-2xl border border-slate-700">
+                <h3 class="text-xl font-semibold mb-4 border-b border-slate-700 pb-2 italic text-purple-400">🎮 Resumo por Partida</h3>
+                <div id="games-list" class="space-y-4">
+                    </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        async function loadDashboard() {
+            // Pegando dados das rotas que você já criou!
+            const resGames = await fetch('/games');
+            const games = await resGames.json();
+            
+            const resRank = await fetch('/ranking');
+            const rankingData = await resRank.json();
+
+            // Preenchendo Cards
+            document.getElementById('total-games').innerText = Object.keys(games).length;
+            document.getElementById('total-players').innerText = Object.keys(rankingData.ranking).length;
+            
+            let killsCount = 0;
+            Object.values(games).forEach(g => killsCount += g.total_kills);
+            document.getElementById('total-kills').innerText = killsCount;
+
+            // Renderizando Ranking
+            const rankList = document.getElementById('ranking-list');
+            Object.entries(rankingData.ranking).forEach(([name, kills], index) => {
+                rankList.innerHTML += `
+                    <div class="flex justify-between items-center bg-slate-800 p-3 rounded-lg border-l-4 border-pink-500">
+                        <span><span class="text-slate-500 mr-2">#${index+1}</span> ${name}</span>
+                        <span class="font-bold text-pink-400">${kills} kills</span>
+                    </div>
+                `;
+            });
+
+            // Renderizando Partidas
+            const gamesList = document.getElementById('games-list');
+            Object.entries(games).forEach(([id, data]) => {
+                gamesList.innerHTML += `
+                    <div class="bg-slate-800 p-3 rounded-lg flex justify-between">
+                        <span class="font-medium">${id.replace('_', ' ')}</span>
+                        <span class="text-slate-400">${data.total_kills} kills totais</span>
+                    </div>
+                `;
+            });
+        }
+        loadDashboard();
+    </script>
+</body>
+</html>
